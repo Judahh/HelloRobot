@@ -14,7 +14,7 @@
 
 //Pins to connect Meccanoids' servos, where chain 1 is left arm, chain 2 is head and chain 3 is right arm
 //pins can be any digital pins, not necessary PWM
-
+ 
 Servo leftArmPitch;
 Servo leftArmRoll;
 Servo leftArmElbow;
