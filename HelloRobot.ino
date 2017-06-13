@@ -26,6 +26,12 @@ Servo rightArmPitch;
 Servo rightArmRoll;
 Servo rightArmElbow;
 
+const int servoMinValue = 0;
+const int servoQtValue = 50;
+const int servoMidValue = 100;
+const int servoMQtValue = 150;
+const int servoMaxValue = 200;
+
 const bool leftArm = 0;
 const bool rightArm = 1;
 
@@ -55,6 +61,8 @@ const int rightDirPin = 13;
 
 int index = 0;
 bool presence = false;
+bool timer = true;// -------------------------------------------------------------------------TIMER!!!!
+int timerDelay = 10000;// -------------------------------------------------------------------------TIMER!!!!
 
 void beep (int speakerPin, float noteFrequency, long noteDuration) {
   int x;
@@ -94,6 +102,16 @@ void r2D2() {
 }
 
 void setJoint(int arm, int angle){
+  bool sideArm=(arm>2);
+  if(arm==leftArmRollPin || arm==rightArmRollPin){
+    angle=( (sideArm*-1) + (!sideArm*1) ) * ( !sideArm*angle + (sideArm*(angle-servoMaxValue)) );
+  }
+  if(arm==leftArmPitchPin || arm==rightArmPitchPin){
+    angle=( (!sideArm*-1) + (sideArm*1) ) * ( sideArm*angle + (!sideArm*(angle-servoMaxValue)) );
+  }
+  if(arm==leftArmElbowPin || arm==rightArmElbowPin){
+    angle=(( (!sideArm*-1) + (sideArm*1) ) *angle)/2+100;
+  }
   switch(arm){
     case leftArmPitchPin:
       leftArmPitch.write(angle); 
@@ -125,18 +143,18 @@ void setJoint(int arm, int angle){
 }
 
 void waveHand(bool arm, int timeD) {
-  setJoint(((arm*5)+leftArmRollPin), 100);
+  setJoint(((arm*5)+leftArmRollPin), servoMQtValue);
   delay(timeD);
 
-  setJoint(((arm*5)+leftArmRollPin), 160);
+  setJoint(((arm*5)+leftArmRollPin), servoMaxValue);
   delay(timeD);
 }
 
 void handGesture(bool arm, int timeD) {
-  setJoint(((arm*5)+leftArmElbowPin), 120);
+  setJoint(((arm*5)+leftArmElbowPin), servoMidValue);
   delay(timeD);
 
-  setJoint(((arm*5)+leftArmElbowPin), 90);
+  setJoint(((arm*5)+leftArmElbowPin), servoMinValue);
   delay(timeD);
 }
 
@@ -160,16 +178,29 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   pinMode(presencePin, INPUT);
   pinMode(speakerPin, OUTPUT);
-  
-  Serial.begin(9600);
+
+  setJoint(0, 0);
+  setJoint(1, 0);
+  setJoint(2, 0);
+  setJoint(3, 0);
+  setJoint(4, 0);
+  setJoint(5, 0);
+  setJoint(6, 0);
+  setJoint(7, 0);
 
   r2D2();
 }
 
 void loop() {
   //  Serial.println("S");
-  presence = digitalRead(presencePin);
+  if(!timer){
+    presence = digitalRead(presencePin);
+  }else{
+    delay(timerDelay);
+    presence = true;
+  }
   digitalWrite(ledPin, presence);
+
 
   if (presence) {
     r2D2();
@@ -181,7 +212,7 @@ void loop() {
       waveHand(leftArm, 500);
     }
 
-    setJoint(rightArmPitchPin, 45);
+    setJoint(rightArmPitchPin, servoQtValue);
     delay(100);
 
     for (int times = 0; times < 5; times++) {
@@ -189,11 +220,13 @@ void loop() {
 //      delay(100);
       handGesture(rightArm, 500);
     }
-
-    setJoint(rightArmPitchPin, 0);
+    
+    setJoint(rightArmPitchPin, servoMinValue);
     delay(100);
 
     r2D2();
-//    delay(5000);
+    if(timer){
+      presence=false;
+    }
   }
 }
