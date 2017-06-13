@@ -47,13 +47,13 @@ const int rightArmRollPin = 6;
 const int rightArmElbowPin = 7;
 
 const int presencePin = 8;
-const int speakerPin = 9;
+const int speakerPin = 11;
 
 const int ledPin = 13;
 
 //pins to set speed on motor driver
-const int leftSpeedPin = 10;
-const int rightSpeedPin = 11;
+const int leftSpeedPin = 9;
+const int rightSpeedPin = 10;
 
 //pins to set direction on motor driver
 const int leftDirPin = 12;
@@ -213,15 +213,18 @@ void loop() {
     }
 
     setJoint(rightArmPitchPin, servoQtValue);
+    setJoint(leftArmPitchPin, servoQtValue);//
     delay(100);
 
     for (int times = 0; times < 5; times++) {
 //      blinkEyes();
 //      delay(100);
       handGesture(rightArm, 500);
+      handGesture(leftArm, 500);//
     }
     
     setJoint(rightArmPitchPin, servoMinValue);
+    setJoint(leftArmPitchPin, servoMinValue);//
     delay(100);
 
     r2D2();
